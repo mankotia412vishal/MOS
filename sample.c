@@ -1,11 +1,14 @@
+// os phase 2
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
-// Initialize 
+int flag = 0;
+int currentLine;
+
 char M[300][4];
-char IR[5];
+char IR[4];
 char R[4];
 int IC;
 int C;
@@ -19,8 +22,7 @@ struct PCB
 };
 
 struct PCB info;
-int flag = 0;
-int currentLine;
+
 int TTC;
 int LLC;
 int PI;
@@ -28,7 +30,7 @@ int TI;
 
 int PTR;
 
-int generated_number[100];
+int generated_no[100];
 int generated_no_index;
 int Program_card_couter;
 int count = 0;
@@ -43,24 +45,20 @@ char str[100];
 
 int T;
 
+void print_status()
+{
+    printf("\nPI IS %d\n", PI);
+    printf("TI IS %d\n", TI);
+    printf("TTC IS %d\n", TTC);
+    printf("LLC IS %d\n", LLC);
+    printf("Ic IS %d\n", IC);
+    printf("T IS %d\n", T);
+    printf("IR IS %s\n", IR);
+}
 
-// void print_status()
-// {
-    
-//     printf("\nPI IS %d\n", PI);
-//     printf("TI IS %d\n", TI);
-//     printf("TTC IS %d\n", TTC);
-//     printf("LLC IS %d\n", LLC);
-//     printf("Ic IS %d\n", IC);
-//     printf("T IS %d\n", T);
-//     printf("IR IS %s\n", IR);
-  
-// }
-
-// Random no genration
+// Allocate function to generate a random memory block
 int Allocate()
 {
-
     srand(time(NULL));
     int address;
     int l = 0;
@@ -69,7 +67,7 @@ int Allocate()
         address = rand() % 30;
         for (int i = 0; i <= generated_no_index; i++)
         {
-            if (generated_number[i] == address)
+            if (generated_no[i] == address)
             {
                 l = 1;
                 break;
@@ -86,22 +84,22 @@ int Allocate()
     }
 
     generated_no_index++;
-    generated_number[generated_no_index] = address;
+    generated_no[generated_no_index] = address;
 
     return address;
 }
-// print karuga no generated
+
 void print_generated_no()
 {
     printf("\n\n");
     for (int i = 0; i <= generated_no_index; i++)
     {
-        printf("%d ", generated_number[i]);
+        printf("%d ", generated_no[i]);
     }
     printf("\n\n");
 }
 
-// Memory block print
+// print the memory block
 void print_memory_block()
 {
     printf("Memory block is:\n\n");
@@ -109,32 +107,23 @@ void print_memory_block()
     int i, j;
     for (i = 0; i < 300; i++)
     {
-        if (i >= 100){
-            printf("M[%d]  ", i);
-    
-        }
-
-            
-        else if (i >= 10 && i < 100){
-            printf("M[%d]   ", i);
-           
-        }
-        
-        else{
-            printf("M[%d]    ", i);
-            }
+        if (i >= 100)
+            printf("%d  ", i);
+        else if (i >= 10 && i < 100)
+            printf("%d   ", i);
+        else
+            printf("%d    ", i);
         for (j = 0; j < 4; j++)
         {
-            printf("%c", M[i][j]);
+            printf("|%c", M[i][j]);
         }
 
-        printf("\n");
+        printf("|\n");
     }
 }
-
+// print the instruction register
 void print_instruction_register()
 {
-    // print the instruction register IR ki value
     int i;
     for (i = 0; i < 4; i++)
     {
@@ -143,9 +132,9 @@ void print_instruction_register()
     printf("\n");
 }
 
-
+// print the general purpose register
 void print_general_purpose_register()
-{ // print the R register ki value
+{
     int i;
     for (i = 0; i < 4; i++)
     {
@@ -169,7 +158,6 @@ int Address_Map(int IC)
 
 int map(int add)
 {
-    // IR ki value ko map karna hai
     if (IR[0] == 'H' && IR[1] == ' ' && IR[2] == ' ' && IR[3] == ' ')
         return;
 
@@ -199,61 +187,61 @@ int map(int add)
     }
 }
 
-void HALT(int msg)
+void Terminate(int msg)
 {
-    // Yeh terminate karega
     T = 1;
 
     FILE *fp = NULL;
-    fp = fopen("output_phase2.txt", "a");
+    fp = fopen("o2.txt", "a");
     char id[10];
     fprintf(fp, "\nJob ID: %s\n", info.JID);
 
     switch (msg)
     {
     case 0:
-        fputs("  No Error\n", fp);
+        fputs("  Job terminated normally no error\n", fp);
         break;
     case 1:
-        fputs("  OUT OF DATA \n", fp);
+        fputs("  Data out of range \n", fp);
         break;
     case 2:
-        fputs("   LINE LIMIT EXCEEDED \n", fp);
+        fputs("  Line limit exceeded error \n", fp);
         break;
     case 3:
-        fputs("  TIME LIMIT EXCEEDED \n", fp);
+        fputs("  Time limit exceeded error \n", fp);
         break;
     case 4:
-        fputs("   OPERATION CODE ERROR \n", fp);
+        fputs("  Invalid opcode error \n", fp);
         break;
     case 5:
-        fputs("  OPERAND ERROR  \n", fp);
+        fputs("  Invalid operand error \n", fp);
         break;
     case 6:
-        fputs("  INVALID PAGE FAULT \n", fp);
+        fputs("  Invalid page fault error \n", fp);
         break;
     case 7:
-        fputs("   TIME LIMIT EXCEEDED  And OPERATION CODE ERROR\n", fp);
+        fputs("  Time limit exceeded and invalid opcode \n", fp);
         break;
     case 8:
-        fputs("  TIME LIMIT EXCEEDED And OPERAND ERROR \n", fp);
+        fputs("  Time limit exceeded and invalid operand \n", fp);
         break;
     }
-    fputs("IC : ", fp);
+    fputs("IC is ", fp);
     fprintf(fp, "%d\n", IC);
-    fputs("IR : ", fp);
+    fputs("IR has ", fp);
     fputs(IR, fp);
-    fputs("\nTTC : ", fp);
+    fputs("\nTTC is ", fp);
     fprintf(fp, "%d\n", TTC);
-    fprintf(fp, "TTL : %d\n", info.TTL);
-    fputs("LLC : ", fp);
+    fprintf(fp, "TTL is %d\n", info.TTL);
+    fputs("LLC is ", fp);
     fprintf(fp, "%d\n", LLC);
-    fprintf(fp, "TLL : %d\n\n", info.TLL);
+    fprintf(fp, "TLL is %d\n\n", info.TLL);
 }
 
 void print_map()
 {
-    
+    // printf("key index is %d \n\n",key_index);
+    // getchar();
     for (int i = 0; i <= key_index; i++)
     {
         printf("%d  %d\n", key[i], value[i]);
@@ -263,15 +251,15 @@ void print_map()
 
 void Load()
 {
-    // Load karega
     int i = 0;
     FILE *fp = NULL;
     char ch;
-    fp = fopen("input_phase2.txt", "r");
+    fp = fopen("i2.txt", "r");
 
     while (fgets(str, 41, fp) != NULL)
     {
-       
+        // printf("%s",str);
+        // printf("position is %d\n",ftell(fp));
         if (str[0] == '$' && str[1] == 'A' && str[2] == 'M' && str[3] == 'J')
         {
             PTR = Allocate() * 10;
@@ -291,12 +279,14 @@ void Load()
                 M[i][3] = '*';
             }
 
-            printf("AMJ  found!!\n");
-            printf("Job Id  is %s\n", info.JID);
-            printf("Total Time Limit is %d\n", info.TTL);
-            printf("Total Line Limit is %d\n\n\n", info.TLL);
-            printf("Page table Register is %d\n", PTR);
-       
+            printf("AMJ instruction found\n");
+            printf("JID is %s\n", info.JID);
+            printf("TTL is %d\n", info.TTL);
+            printf("TLL is %d\n\n\n", info.TLL);
+            printf("PTR is %d\n", PTR);
+            getchar();
+            // print_memory_block();
+            // getchar();
 
             int col = 0;
             int temp, temp1;
@@ -304,12 +294,15 @@ void Load()
             while (1)
             {
 
+                // print_memory_block();
+                // print_generated_no();
+                // getchar();
+
                 fgets(str, 100, fp);
                 if ((str[0] == '$' && str[1] == 'D' && str[2] == 'T' && str[3] == 'A'))
                     break;
                 temp = Allocate();
                 temp1 = temp * 10;
-                //temp mein adreess haii
                 M[PTR + Program_card_couter][0] = '1';
                 M[PTR + Program_card_couter][3] = temp % 10 + '0';
                 M[PTR + Program_card_couter][2] = temp / 10 + '0';
@@ -332,12 +325,15 @@ void Load()
 
             currentLine = ftell(fp);
 
-        
+            // printf("loading is completed\n");
+
+            // printf("\nenter to start execution:\n");
+            // getch();
         }
         if ((str[0] == '$' && str[1] == 'D' && str[2] == 'T' && str[3] == 'A'))
         {
 
-            EXECUTE();
+            START_EXECUTION();
         }
 
         if ((str[0] == '$' && str[1] == 'E' && str[2] == 'N' && str[3] == 'D'))
@@ -345,10 +341,9 @@ void Load()
             i++;
 
             print_memory_block();
-           
+            // print_status();
 
-            printf("\n\n\nEND Job. %d\n\n\n", i);
-            getch();
+            printf("\n\n\nEND OF JOB no. %d\n\n\n", i);
             printf("%s\n\n", str);
 
             if (message == 1)
@@ -357,7 +352,10 @@ void Load()
                 printf("position is %d\n", ftell(fp));
             }
 
-            
+            // Terminate(message);
+
+            printf("enter to load another job:\n");
+            getchar();
             INIT();
         }
     }
@@ -365,7 +363,6 @@ void Load()
 
 void INIT()
 {
-    // Initialize karega memory 300
     for (int i = 0; i < 300; i++)
     {
         for (int j = 0; j < 4; j++)
@@ -398,7 +395,7 @@ void INIT()
     count = 0;
 }
 
-void EXECUTE()
+void START_EXECUTION()
 {
     IC = 0;
     EXECUTE_USER_PROGRAM();
@@ -415,27 +412,30 @@ void EXECUTE_USER_PROGRAM()
             IR[i] = M[addr][i];
         }
         IC++;
+        // printf("\n\nInstruction register has:\n\n");
+
+        // getchar();
 
         simulation();
         gen_address = map((IR[2] - '0') * 10 + (IR[3] - '0'));
-
+        // print_status();
         if (T == 1)
         {
-
+            // print_status();
             break;
         }
 
         if (!((IR[0] == 'G' && IR[1] == 'D') || (IR[0] == 'P' && IR[1] == 'D') || (IR[0] == 'H' && IR[1] == ' ') || (IR[0] == 'L' && IR[1] == 'R') || (IR[0] == 'S' && IR[1] == 'R') || (IR[0] == 'C' && IR[1] == 'R') || (IR[0] == 'B' && IR[1] == 'T')))
         {
             PI = 1;
-
+            // print_status();
             MOS();
             break;
         }
 
         if (TI == 2)
         {
-
+            // print_status();
             MOS();
             break;
         }
@@ -444,7 +444,8 @@ void EXECUTE_USER_PROGRAM()
         {
             SI = 1;
             MOS();
-
+            // print_status();
+            // getchar();
             if (T == 1)
                 break;
         }
@@ -452,7 +453,8 @@ void EXECUTE_USER_PROGRAM()
         {
             SI = 2;
             MOS();
-
+            // print_status();
+            // getchar();
             if (T == 1)
                 break;
         }
@@ -510,11 +512,11 @@ void MOS()
         }
         else if (PI == 1)
         {
-            HALT(4);
+            Terminate(4);
         }
         else if (PI == 2)
         {
-            HALT(5);
+            Terminate(5);
         }
         else if (PI == 3)
         {
@@ -526,7 +528,7 @@ void MOS()
                 key[key_index] = (IR[2] - '0') * 10 + (IR[3] - '0');
                 value[key_index] = Allocate();
                 int temp = value[key_index];
-
+                // printf("Allocated memory block is %d for %d operand\n\n\n",value[key_index] ,key[key_index]);
                 M[PTR + Program_card_couter][0] = '1';
                 M[PTR + Program_card_couter][3] = temp % 10 + '0';
                 M[PTR + Program_card_couter][2] = temp / 10 + '0';
@@ -534,12 +536,10 @@ void MOS()
                 PI = 0;
                 return value[key_index] * 10;
             }
-            
             else
-
             {
 
-                HALT(6);
+                Terminate(6);
             }
         }
     }
@@ -559,42 +559,43 @@ void MOS()
                 H();
                 return;
             }
-            HALT(3);
+            Terminate(3);
         }
-       
-        
         else if (PI == 1)
         {
-            HALT(7);
+            Terminate(7);
         }
         else if (PI == 2)
         {
-            HALT(8);
+            Terminate(8);
         }
         else if (PI == 3)
         {
-            HALT(3);
+            Terminate(3);
         }
     }
 }
 
 void GD()
 {
-
+    // printf("press enter to check memory\n");
+    // getch();
     int row = map((IR[2] - '0') * 10 + (IR[3] - '0'));
-
+    //    printf("row is %d\n",row);
     int col = 0;
-
+    // char str[100];
     FILE *fp = NULL;
-    fp = fopen("input_phase2.txt", "r");
+    fp = fopen("i2.txt", "r");
 
     fseek(fp, currentLine, SEEK_SET);
     fgets(str, 100, fp);
     if ((str[0] == '$' && str[1] == 'E' && str[2] == 'N' && str[3] == 'D'))
     {
+        // printf("current line is %d %d\n",currentLine,ftell(fp));
+        // getchar();
 
         message = 1;
-        HALT(1);
+        Terminate(1);
         return;
     }
     for (int i = 0; i < strlen(str) - 1; i++)
@@ -609,6 +610,7 @@ void GD()
     }
     currentLine = ftell(fp);
     SI = 0;
+    // print_memory_block();
 }
 
 void PD()
@@ -617,20 +619,22 @@ void PD()
     LLC++;
     if (LLC > info.TLL)
     {
-        HALT(2);
+        Terminate(2);
+        // printf("TLL exceeded\n");
+        // getchar();
 
         return;
     }
-    fp = fopen("output_phase2.txt", "a");
-
-
+    fp = fopen("o2.txt", "a");
     if (flag == 0)
         flag++;
     else
         fprintf(fp, "\n");
-
+    // printf("press enter to write output\n");
+    // getch();
     int row = map((IR[2] - '0') * 10 + (IR[3] - '0'));
-
+    // printf("row is %d\n",row);
+    // getchar();
     int col = 0;
     for (int i = row; i < row + 10; i++)
     {
@@ -645,13 +649,8 @@ void PD()
 void H()
 {
 
-    HALT(0);
+    Terminate(0);
 }
-// void H()
-// {
-
-//     Terminate(0);
-// }
 
 void LR()
 {
@@ -660,6 +659,10 @@ void LR()
     {
         R[i] = M[row][i];
     }
+
+    // printf("General purpose register has:\n\n");
+    // getchar();
+    // print_general_purpose_register();
 }
 
 void SR()
@@ -669,14 +672,10 @@ void SR()
     {
         M[row][i] = R[i];
     }
-}
-void BT()
-{
-    if (C == 1)
-    {
-        IC = (IR[2] - '0') * 10 + (IR[3] - '0');
-        C = 0;
-    }
+
+    // printf("Memory block has:\n\n");
+    // getchar();
+    // print_memory_block();
 }
 
 void CR()
@@ -697,45 +696,52 @@ void CR()
     }
 }
 
+void BT()
+{
+    if (C == 1)
+    {
+        IC = (IR[2] - '0') * 10 + (IR[3] - '0');
+        C = 0;
+    }
+}
 
+// write main function
 int main()
 {
+    // declare variables
+    printf("\n\n######################################################################################## B1 Batch - Group 2 #####################################################################################\n\n\n\n");
 
-    printf("\n\n ************************************************************************************************************************\n\n\n\n");
-
-    printf("\t\t\t\t\t\t|  Group 9 B2  |\n\n\n");
-
-    printf("Prajwal Atram      \n");
-    printf("Hitashri Patil     \n");
-    printf("Nupur Shinde    \n");
-    printf("Vishal Singh     \n");
-    printf("Sameer  Meshram    \n\n");
-
-    printf("Phase 2 Implementation \n\n");
+    printf("\t\t\t\t\t\t\t\t\t\t\tAmey Chopde        13\n");
+    printf("\t\t\t\t\t\t\t\t\t\t\tVishal Govindani   18\n");
+    printf("\t\t\t\t\t\t\t\t\t\t\tKuhu Mukhopadhay   32\n");
+    printf("\t\t\t\t\t\t\t\t\t\t\tTanmay Mutalik     33\n\n");
+    printf("This program will show implementation of os phase 1\n");
+    printf("The code written in input.txt is\n\n");
+    // code to read from a file and print the contents on the screen
 
     FILE *f = NULL;
     char ch;
-    f = fopen("input_phase2.txt", "r");
+    f = fopen("i2.txt", "r");
     if (f == NULL)
     {
-        printf("not found!!");
+        printf("File not found");
         exit(1);
     }
     while ((ch = fgetc(f)) != EOF)
     {
-        //Sab kuch read karuga input file  mein se 
-        // printf("%c", ch);
+        printf("%c", ch);
     }
     fclose(f);
 
     printf("\n\n\nEnter any key to continue\n\n");
     getch();
-    
-   
 
-
+    // printf("\n\nInit is called first\n\n");
     INIT();
-
+    // print_memory_block();
+    // printf("\n\nenter any key to continue\n\n");
+    // getch();
+    // printf("\n\nLoad is called next\n\n");
     Load();
 
     return 0;

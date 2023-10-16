@@ -7,10 +7,10 @@ private:
     char Memory[100][4]; // Memory
     unsigned char R[4];  // Register
     unsigned char IR[4]; // Instruction Registers
-    unsigned int IC; // Instruction counter
-    bool C; // Toggle Value
-    int SI; // Interrupt
-    char buffer[200]; // Buffer
+    unsigned int IC;     // Instruction counter
+    bool C;              // Toggle Value
+    int SI;              // Interrupt
+    char buffer[200];    // Buffer
 
 public:
     void INIT();
@@ -26,8 +26,6 @@ public:
     fstream inputfile;
     fstream outputfile;
 };
-
-
 
 void OS ::INIT()
 {
@@ -71,6 +69,7 @@ void OS ::LOAD()
             for (int i = 0; i < 100; i++)
             {
                 cout << "M[" << i << "]\t";
+                
                 for (int j = 0; j < 4; j++)
                 {
                     cout << Memory[i][j];
@@ -79,12 +78,13 @@ void OS ::LOAD()
                 if (i % 10 == 9)
                     cout << endl;
             }
+            cin.get();
             continue;
         }
         else
         {
             int k = 0;
-            
+
             int limit = x + 10;
             for (; x < limit; ++x)
             {
@@ -174,7 +174,6 @@ void OS::EXECUTE()
                 IC = loc;
                 C = false;
             }
-            
         }
     }
 }
@@ -183,17 +182,17 @@ void OS::MOS()
 {
     switch (SI)
     {
-    case 1: 
+    case 1:
         for (int i = 0; i <= 40; i++)
             buffer[i] = ' ';
         READ();
         break;
 
     case 2:
-        WRITE(); 
+        WRITE();
         break;
 
-    case 3: 
+    case 3:
 
         HALT();
         break;
